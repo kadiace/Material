@@ -1,11 +1,9 @@
 /* eslint-disable react/no-unknown-property */
-import { ThreeElements, useFrame } from '@react-three/fiber';
+import { MeshProps, useFrame } from '@react-three/fiber';
 import { useRef, useState } from 'react';
 import * as THREE from 'three';
 
-type BoxProps = ThreeElements['mesh'];
-
-function Box(props: BoxProps) {
+function Box(props: MeshProps) {
   /* eslint-disable */
   const meshRef = useRef<THREE.Mesh>(null!);
   const [hovered, setHover] = useState(false);
@@ -25,7 +23,7 @@ function Box(props: BoxProps) {
       onPointerOut={() => setHover(false)}
       {...props}
     >
-      <boxGeometry args={[5, 5, 5]} />
+      <octahedronGeometry args={[3]} />
       <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
     </mesh>
   );
