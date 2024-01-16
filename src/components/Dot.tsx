@@ -11,30 +11,39 @@ function Dot(props: DotProps) {
   const { colorOut, colorIn, size } = props;
 
   /** STATE */
-  const [scale, setScale] = useState(1);
+  const [scale, setScale] = useState(0);
   return (
     <div
-      id='outline'
+      id='dot layout'
       style={{
         width: size,
         height: size,
-        borderRadius: '50%',
-        backgroundColor: colorOut,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        scale: `${scale}`,
       }}
-      {...props}
     >
+      <div
+        id='outline'
+        style={{
+          width: size,
+          height: size,
+          position: 'absolute',
+          borderRadius: '50%',
+          backgroundColor: colorOut,
+          scale: `${scale * 0.8 + 0.2}`,
+        }}
+        {...props}
+      />
       <div
         id='dot'
         style={{
           width: size,
           height: size,
+          position: 'absolute',
           borderRadius: '50%',
           backgroundColor: colorIn,
-          scale: '0.9',
+          scale: `${scale * 0.8}`,
         }}
       />
     </div>

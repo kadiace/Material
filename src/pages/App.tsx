@@ -11,7 +11,7 @@ function App() {
       style={{
         width: '100%',
         height: '100%',
-        position: 'absolute',
+        position: 'fixed',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
