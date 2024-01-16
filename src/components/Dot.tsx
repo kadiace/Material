@@ -1,22 +1,22 @@
 /* eslint-disable react/no-unknown-property */
-import { Color, MeshProps } from '@react-three/fiber';
 
-type DotProps = MeshProps & { colorOut: Color; colorIn: Color };
+export type DotProps = JSX.Element & { colorOut: string; colorIn: string };
 
 function Dot(props: DotProps) {
   const { colorOut, colorIn } = props;
   // Scale hook
   return (
-    <group>
-      <mesh {...props}>
-        <ringGeometry args={[0.45, 0.5, 100]} />
-        <meshStandardMaterial color={colorOut} />
-      </mesh>
-      <mesh {...props}>
-        <ringGeometry args={[0, 0.45, 100]} />
-        <meshStandardMaterial color={colorIn} />
-      </mesh>
-    </group>
+    <div
+      id='background test'
+      style={{
+        position: 'absolute',
+        width: '1000px',
+        height: '1000px',
+        borderRadius: '50%',
+        backgroundColor: colorOut,
+      }}
+      {...props}
+    />
   );
 }
 

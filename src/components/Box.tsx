@@ -23,7 +23,7 @@ function Box(props: MeshProps) {
       onPointerOut={() => setHover(false)}
       {...props}
     >
-      <octahedronGeometry args={[3]} />
+      <octahedronGeometry args={[1]} />
       <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
     </mesh>
   );
