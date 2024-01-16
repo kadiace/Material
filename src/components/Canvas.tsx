@@ -9,6 +9,7 @@ import { Canvas as Canv } from '@react-three/fiber';
 function Canvas() {
   return (
     <div
+      id='canvas'
       style={{
         width: '100%',
         height: '100%',

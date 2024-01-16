@@ -1,4 +1,5 @@
 /* eslint-disable react/no-unknown-property */
+import Background from 'components/Background';
 import Canvas from 'components/Canvas';
 
 import 'pages/App.css';
@@ -16,16 +17,7 @@ function App() {
         justifyContent: 'center',
       }}
     >
-      <div
-        id='background test'
-        style={{
-          position: 'absolute',
-          width: '1000px',
-          height: '1000px',
-          borderRadius: '50%',
-          backgroundColor: 'black',
-        }}
-      />
+      <Background />
       <Canvas />
     </div>
   );
