@@ -3,7 +3,7 @@ import Box from 'components/Box';
 
 import 'pages/App.css';
 
-import { OrbitControls } from '@react-three/drei';
+// import { OrbitControls } from '@react-three/drei';
 import { Canvas as Canv } from '@react-three/fiber';
 
 function Canvas() {
@@ -24,13 +24,13 @@ function Canvas() {
         <ambientLight />
         <Box position={[0, 0, 0]} />
         {/* for debugging */}
-        <OrbitControls />
+        {/* <OrbitControls />
         <gridHelper
           args={[200, 200]}
           position={[0, 0, -0.01]}
           rotation={[Math.PI / 2, 0, 0]}
         />
-        <axesHelper args={[30]} />
+        <axesHelper args={[30]} /> */}
 
         <group>
           <mesh position={[1, 2, 0]}>

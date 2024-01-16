@@ -1,13 +1,33 @@
-import Dot, { DotProps } from './Dot';
+import { useEffect, useState } from 'react';
+
+import Dot from './Dot';
 
 function Background() {
+  /** CONST */
   const colorIn = '#CCF9FF';
   const colorOut = '#E6E6E6';
-  const size = '40px';
-  const dotList: DotProps[] = [];
-  for (let i = 0; i < 3000; i += 1) {
-    dotList.push({ colorIn, colorOut, size });
-  }
+  const size = 40;
+
+  /** HOOK */
+  const [gridSize, setGridSize] = useState([
+    Math.floor(window.innerWidth / size) + 1,
+    Math.floor(window.innerHeight / size) + 1,
+  ]);
+
+  useEffect(() => {
+    const handleGridResize = () => {
+      setGridSize([
+        Math.floor(window.innerWidth / size) + 1,
+        Math.floor(window.innerHeight / size) + 1,
+      ]);
+    };
+    window.addEventListener('resize', handleGridResize);
+
+    return () => {
+      window.removeEventListener('resize', handleGridResize);
+    };
+  });
+
   return (
     <div
       id='background'
@@ -15,13 +35,20 @@ function Background() {
         display: 'grid',
         width: '100%',
         height: '100%',
-        gridTemplateColumns: `repeat(auto-fill, ${size})`,
-        gridTemplateRows: `repeat(auto-fill, ${size})`,
+        gridTemplateColumns: `repeat(${gridSize[0]}, ${size}px)`,
+        gridTemplateRows: `repeat(${gridSize[1]}, ${size}px)`,
       }}
     >
-      {dotList.map((elem, index) => (
-        <Dot key={index} {...elem} />
-      ))}
+      {Array(gridSize[0] * gridSize[1])
+        .fill(0)
+        .map((value, index) => (
+          <Dot
+            key={index}
+            colorIn={colorIn}
+            colorOut={colorOut}
+            size={`${size}px`}
+          />
+        ))}
     </div>
   );
 }

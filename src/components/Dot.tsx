@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useState } from 'react';
 
 export type DotProps = PropsWithChildren & {
   colorOut: string;
@@ -7,8 +7,11 @@ export type DotProps = PropsWithChildren & {
 };
 
 function Dot(props: DotProps) {
+  /** CONST */
   const { colorOut, colorIn, size } = props;
-  // Scale hook
+
+  /** STATE */
+  const [scale, setScale] = useState(1);
   return (
     <div
       id='outline'
@@ -20,6 +23,7 @@ function Dot(props: DotProps) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        scale: `${scale}`,
       }}
       {...props}
     >
