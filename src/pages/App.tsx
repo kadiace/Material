@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 import Background from 'components/Background';
-import Canvas from 'components/Canvas';
 
+// import Canvas from 'components/Canvas';
 import 'pages/App.css';
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
       }}
     >
       <Background />
-      <Canvas />
+      {/* <Canvas /> */}
     </div>
   );
 }

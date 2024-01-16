@@ -7,20 +7,19 @@ function Background() {
   const colorIn = '#CCF9FF';
   const colorOut = '#E6E6E6';
   const size = 40;
-
-  /** HOOK */
   const [gridSize, setGridSize] = useState([
     Math.floor(window.innerWidth / size) + 1,
     Math.floor(window.innerHeight / size) + 1,
   ]);
+  const handleGridResize = () => {
+    setGridSize([
+      Math.floor(window.innerWidth / size) + 1,
+      Math.floor(window.innerHeight / size) + 1,
+    ]);
+  };
 
+  /** HOOK */
   useEffect(() => {
-    const handleGridResize = () => {
-      setGridSize([
-        Math.floor(window.innerWidth / size) + 1,
-        Math.floor(window.innerHeight / size) + 1,
-      ]);
-    };
     window.addEventListener('resize', handleGridResize);
 
     return () => {
@@ -46,7 +45,9 @@ function Background() {
             key={index}
             colorIn={colorIn}
             colorOut={colorOut}
-            size={`${size}px`}
+            size={size}
+            gridX={index % gridSize[0]}
+            gridY={Math.floor(index / gridSize[0])}
           />
         ))}
     </div>
