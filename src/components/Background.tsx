@@ -4,8 +4,6 @@ import Dot from './Dot';
 
 function Background() {
   /** CONST */
-  const colorIn = '#CCF9FF';
-  const colorOut = '#E6E6E6';
   const size = 40;
   const [gridSize, setGridSize] = useState([
     Math.floor(window.innerWidth / size) + 1,
@@ -31,6 +29,7 @@ function Background() {
     <div
       id='background'
       style={{
+        position: 'absolute',
         display: 'grid',
         width: '100%',
         height: '100%',
@@ -43,8 +42,6 @@ function Background() {
         .map((value, index) => (
           <Dot
             key={index}
-            colorIn={colorIn}
-            colorOut={colorOut}
             size={size}
             gridX={index % gridSize[0]}
             gridY={Math.floor(index / gridSize[0])}
