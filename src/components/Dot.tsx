@@ -40,73 +40,76 @@ function Dot(props: DotProps) {
   // for debug
   //   const colorIn = '#CCF9FF';
   //   const colorOut = '#E6E6E6';
-  const colorIn = 'hsla(345, 100%, 39%, 0.8)';
-  const colorOut = 'hsla(256, 100%, 39%, 0.8)';
+  const colorIn = 'hsla(256, 100%, 40%, 0.8)';
+  const colorOut = 'hsla(61, 100%, 40%, 0.8)';
   const innerPortion = 0.8;
   const dotPosition: Position = [
     gridX * size + size / 2,
     gridY * size + size / 2,
   ];
-  const hoverEffectDistance = 300;
+  const hoverEffectDistance = size * 5;
   const hoverMinScale = 0.6;
-  const clickEffectDistance = 150;
+  const clickEffectDistance = size * 2;
   const clickMinScale = 0;
   const interval = 50;
-  const recoveryTime = 2;
   const [scale, setScale] = useState(1);
-  const [mousePosition, setMousePosition] = useState<Position>([0, 0]);
+  const [distance, setDistance] = useState<number>(Number.POSITIVE_INFINITY);
   const [isMouseDown, setIsMouseDown] = useState(false);
-  const getHoverScale = (distance: number) => {
-    return getLinearScale(distance, hoverEffectDistance, hoverMinScale);
+  const getHoverScale = (currentDistance: number) => {
+    return getLinearScale(currentDistance, hoverEffectDistance, hoverMinScale);
   };
-  const getClickScale = (distance: number) => {
-    return getQuadraticScale(distance, clickEffectDistance, clickMinScale);
+  const getClickScale = (currentDistance: number) => {
+    return getQuadraticScale(
+      currentDistance,
+      clickEffectDistance,
+      clickMinScale,
+    );
   };
   const handleMousePosition = (event: MouseEvent) => {
-    const currentMousePosition: Position = [event.clientX, event.clientY];
-    setMousePosition(currentMousePosition);
-    const distance = calculateDistance(dotPosition, currentMousePosition);
+    const mousePosition: Position = [event.clientX, event.clientY];
+    const currentDistance = calculateDistance(dotPosition, mousePosition);
+    setDistance(currentDistance);
 
     /** @NOTE Click effect. */
     if (isMouseDown && distance <= clickEffectDistance) {
-      setScale(Math.min(scale, getClickScale(distance)));
+      setScale(
+        Math.min(scale, getClickScale(distance), getHoverScale(distance)),
+      );
 
       /** @NOTE Hover effect. */
     } else if (distance <= hoverEffectDistance) {
       setScale(Math.min(scale, getHoverScale(distance)));
     }
   };
-  const handleMouseDown = () => {
+  const handleMouseDown = (event: MouseEvent) => {
     setIsMouseDown(true);
   };
-  const handleMouseUp = () => {
+  const handleMouseUp = (event: MouseEvent) => {
     setIsMouseDown(false);
   };
   const handleTime = () => {
-    const distance = calculateDistance(dotPosition, mousePosition);
-
     /** @NOTE Click effect. */
     if (isMouseDown && distance <= clickEffectDistance) {
-      setScale(
-        Math.min(
-          scale + interval / 1000 / recoveryTime,
-          getClickScale(distance),
-          getHoverScale(distance),
-        ),
-      );
+      const target = Math.min(getClickScale(distance), getHoverScale(distance));
+      if (target > scale) {
+        setScale(target - (target - scale) * (19 / 20));
+      } else {
+        setScale(target + (scale - target) * (1 / 4));
+      }
 
       /** @NOTE Hover effect. */
     } else if (distance <= hoverEffectDistance) {
-      setScale(
-        Math.min(
-          scale + interval / 1000 / recoveryTime,
-          getHoverScale(distance),
-        ),
-      );
+      const target = getHoverScale(distance);
+      if (target > scale) {
+        setScale(target - (target - scale) * (19 / 20));
+      } else {
+        setScale(target + (scale - target) / 4);
+      }
 
       /** @NOTE Non-effect area. */
     } else if (distance > hoverEffectDistance && scale < 1) {
-      setScale(Math.min(scale + interval / 1000 / recoveryTime, 1));
+      const target = 1;
+      setScale(target - (target - scale) * (19 / 20));
     }
   };
 
@@ -122,20 +125,23 @@ function Dot(props: DotProps) {
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [scale, mousePosition, isMouseDown]);
+  }, [scale, distance, isMouseDown]);
 
   return (
     <div
       id='dot layout'
+      draggable='false'
       style={{
         width: size,
         height: size,
         alignItems: 'center',
         justifyContent: 'center',
+        pointerEvents: 'none',
       }}
     >
       <div
         id='outline'
+        draggable='false'
         style={{
           width: size,
           height: size,
@@ -143,11 +149,13 @@ function Dot(props: DotProps) {
           borderRadius: '50%',
           backgroundColor: colorOut,
           scale: `${scale * innerPortion + (1 - innerPortion)}`,
+          pointerEvents: 'none',
         }}
         {...props}
       />
       <div
         id='dot'
+        draggable='false'
         style={{
           width: size,
           height: size,
@@ -155,6 +163,7 @@ function Dot(props: DotProps) {
           borderRadius: '50%',
           backgroundColor: colorIn,
           scale: `${scale * innerPortion}`,
+          pointerEvents: 'none',
         }}
       />
     </div>

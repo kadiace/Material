@@ -8,6 +8,7 @@ function App() {
   return (
     <div
       id='root'
+      draggable='false'
       style={{
         width: '100%',
         height: '100%',
@@ -15,6 +16,7 @@ function App() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        pointerEvents: 'none',
       }}
     >
       <Background />

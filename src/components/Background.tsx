@@ -6,13 +6,13 @@ function Background() {
   /** CONST */
   const size = 40;
   const [gridSize, setGridSize] = useState([
-    Math.floor(window.innerWidth / size) + 1,
-    Math.floor(window.innerHeight / size) + 1,
+    Math.ceil(window.innerWidth / size),
+    Math.ceil(window.innerHeight / size),
   ]);
   const handleGridResize = () => {
     setGridSize([
-      Math.floor(window.innerWidth / size) + 1,
-      Math.floor(window.innerHeight / size) + 1,
+      Math.ceil(window.innerWidth / size),
+      Math.ceil(window.innerHeight / size),
     ]);
   };
 
@@ -28,6 +28,7 @@ function Background() {
   return (
     <div
       id='background'
+      draggable='false'
       style={{
         position: 'absolute',
         display: 'grid',
@@ -35,6 +36,7 @@ function Background() {
         height: '100%',
         gridTemplateColumns: `repeat(${gridSize[0]}, ${size}px)`,
         gridTemplateRows: `repeat(${gridSize[1]}, ${size}px)`,
+        pointerEvents: 'none',
       }}
     >
       {Array(gridSize[0] * gridSize[1])
