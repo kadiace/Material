@@ -4,7 +4,18 @@ import Background from 'components/Background';
 // import Canvas from 'components/Canvas';
 import 'pages/App.css';
 
+import { useEffect } from 'react';
+
 function App() {
+  useEffect(() => {
+    document.addEventListener(
+      'touchmove',
+      (event: TouchEvent) => {
+        event.preventDefault();
+      },
+      { passive: false },
+    );
+  }, []);
   return (
     <div
       id='root'
@@ -17,6 +28,9 @@ function App() {
         alignItems: 'center',
         justifyContent: 'center',
         pointerEvents: 'none',
+        WebkitUserSelect: 'none',
+        WebkitTouchCallout: 'none',
+        userSelect: 'none',
       }}
     >
       <Background />

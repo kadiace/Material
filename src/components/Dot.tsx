@@ -9,24 +9,28 @@ const getLinearScale = (
   distance: number,
   effectDistance: number,
   minScale: number,
+  maxScale: number,
 ) => {
-  return (distance / effectDistance) * (1 - minScale) + minScale;
+  return (distance / effectDistance) * (maxScale - minScale) + minScale;
 };
 const getQuadraticScale = (
   distance: number,
   effectDistance: number,
   minScale: number,
+  maxScale: number,
 ) => {
-  return (distance / effectDistance) ** 2 * (1 - minScale) + minScale;
+  return (distance / effectDistance) ** 2 * (maxScale - minScale) + minScale;
 };
-/* eslint-disable @typescript-eslint/no-unused-vars */
-const getRootScale = (
-  distance: number,
-  effectDistance: number,
-  minScale: number,
-) => {
-  return Math.sqrt(distance / effectDistance) * (1 - minScale) + minScale;
-};
+// const getRootScale = (
+//   distance: number,
+//   effectDistance: number,
+//   minScale: number,
+//   maxScale: number,
+// ) => {
+//   return (
+//     Math.sqrt(distance / effectDistance) * (maxScale - minScale) + minScale
+//   );
+// };
 
 export type DotProps = {
   size: number;
@@ -37,9 +41,6 @@ export type DotProps = {
 function Dot(props: DotProps) {
   /** CONST */
   const { size, gridX, gridY } = props;
-  // for debug
-  //   const colorIn = '#CCF9FF';
-  //   const colorOut = '#E6E6E6';
   const colorIn = 'hsla(256, 100%, 40%, 0.8)';
   const colorOut = 'hsla(61, 100%, 40%, 0.8)';
   const innerPortion = 0.8;
@@ -47,83 +48,140 @@ function Dot(props: DotProps) {
     gridX * size + size / 2,
     gridY * size + size / 2,
   ];
-  const hoverEffectDistance = size * 5;
+  const defaultScale = 1;
+  const hoverEffectDistance = size * 8;
   const hoverMinScale = 0.6;
-  const clickEffectDistance = size * 2;
+  const clickEffectDistance = size * 3;
   const clickMinScale = 0;
-  const interval = 50;
-  const [scale, setScale] = useState(1);
+  const clickMaxScale =
+    hoverMinScale +
+    ((1 - hoverMinScale) * clickEffectDistance) / hoverEffectDistance;
+  const interval = 10;
+  const recoverRatio = 1 / 20;
+  const shrinkRatio = 1 / 4;
+
+  /** STATE */
+  const [scale, setScale] = useState(defaultScale);
   const [distance, setDistance] = useState<number>(Number.POSITIVE_INFINITY);
   const [isMouseDown, setIsMouseDown] = useState(false);
-  const getHoverScale = (currentDistance: number) => {
-    return getLinearScale(currentDistance, hoverEffectDistance, hoverMinScale);
-  };
-  const getClickScale = (currentDistance: number) => {
-    return getQuadraticScale(
-      currentDistance,
-      clickEffectDistance,
-      clickMinScale,
+
+  /** LAMBDA FUNCTION */
+  const getHoverScale = () => {
+    return getLinearScale(
+      distance,
+      hoverEffectDistance,
+      hoverMinScale,
+      defaultScale,
     );
   };
-  const handleMousePosition = (event: MouseEvent) => {
+  const getClickScale = () => {
+    return getQuadraticScale(
+      distance,
+      clickEffectDistance,
+      clickMinScale,
+      clickMaxScale,
+    );
+  };
+  const getTargetScale = () => {
+    /** @NOTE Click effect. */
+    if (isMouseDown && distance <= clickEffectDistance) {
+      return getClickScale();
+    }
+    /** @NOTE Hover effect. */
+    if (distance <= hoverEffectDistance) {
+      return getHoverScale();
+    }
+    /** @NOTE Non-effect area. */
+    return 1;
+  };
+  const changeTouchDistance = (event: TouchEvent) => {
+    const distances: number[] = [];
+    for (let i = 0; i < event.touches.length; i += 1) {
+      const touchPosition: Position = [
+        event.touches[i].clientX,
+        event.touches[i].clientY,
+      ];
+      distances.push(calculateDistance(dotPosition, touchPosition));
+    }
+    setDistance(Math.min(...distances));
+  };
+
+  /** INTERVAL EVENT HANDLER */
+  const handleInterval = () => {
+    const target = getTargetScale();
+    const diff = target - scale;
+    if (diff !== 0) {
+      const ratio = diff > 0 ? diff * recoverRatio : diff * shrinkRatio;
+      setScale(Math.abs(ratio) < 1e-4 ? target : scale + ratio);
+    }
+  };
+
+  /** MOUSE EVENT HANDLER */
+  const handleMouseMove = (event: MouseEvent) => {
     const mousePosition: Position = [event.clientX, event.clientY];
     const currentDistance = calculateDistance(dotPosition, mousePosition);
     setDistance(currentDistance);
 
-    /** @NOTE Click effect. */
-    if (isMouseDown && distance <= clickEffectDistance) {
-      setScale(
-        Math.min(scale, getClickScale(distance), getHoverScale(distance)),
-      );
-
-      /** @NOTE Hover effect. */
-    } else if (distance <= hoverEffectDistance) {
-      setScale(Math.min(scale, getHoverScale(distance)));
+    const target = getTargetScale();
+    const diff = target - scale;
+    if (diff < 0) {
+      const ratio = diff * shrinkRatio;
+      setScale(Math.abs(ratio) < 1e-4 ? target : scale + ratio);
     }
   };
-  const handleMouseDown = (event: MouseEvent) => {
+  const handleMouseDown = () => {
     setIsMouseDown(true);
   };
-  const handleMouseUp = (event: MouseEvent) => {
+  const handleMouseUp = () => {
     setIsMouseDown(false);
   };
-  const handleTime = () => {
-    /** @NOTE Click effect. */
-    if (isMouseDown && distance <= clickEffectDistance) {
-      const target = Math.min(getClickScale(distance), getHoverScale(distance));
-      if (target > scale) {
-        setScale(target - (target - scale) * (19 / 20));
-      } else {
-        setScale(target + (scale - target) * (1 / 4));
-      }
+  const handleMouseOut = () => {
+    setDistance(Number.POSITIVE_INFINITY);
+  };
 
-      /** @NOTE Hover effect. */
-    } else if (distance <= hoverEffectDistance) {
-      const target = getHoverScale(distance);
-      if (target > scale) {
-        setScale(target - (target - scale) * (19 / 20));
-      } else {
-        setScale(target + (scale - target) / 4);
-      }
+  /** TOUCH EVENT HANDLER */
+  const handleTouchMove = (event: TouchEvent) => {
+    changeTouchDistance(event);
 
-      /** @NOTE Non-effect area. */
-    } else if (distance > hoverEffectDistance && scale < 1) {
-      const target = 1;
-      setScale(target - (target - scale) * (19 / 20));
+    const target = getTargetScale();
+    const diff = target - scale;
+    if (diff < 0) {
+      const ratio = diff * shrinkRatio;
+      setScale(Math.abs(ratio) < 1e-4 ? target : scale + ratio);
+    }
+  };
+  const handleTouchStart = (event: TouchEvent) => {
+    changeTouchDistance(event);
+    setIsMouseDown(true);
+  };
+  const handleTouchEnd = (event: TouchEvent) => {
+    if (event.touches.length === 0) {
+      setDistance(Number.POSITIVE_INFINITY);
+      setIsMouseDown(false);
+    } else {
+      changeTouchDistance(event);
     }
   };
 
   /** HOOK */
   useEffect(() => {
-    const time = setInterval(handleTime, interval);
-    window.addEventListener('mousemove', handleMousePosition);
+    const time = setInterval(handleInterval, interval);
+    window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mouseout', handleMouseOut);
+    window.addEventListener('touchmove', handleTouchMove);
+    window.addEventListener('touchstart', handleTouchStart);
+    window.addEventListener('touchend', handleTouchEnd);
     return () => {
       clearInterval(time);
-      window.removeEventListener('mousemove', handleMousePosition);
+      window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mouseout', handleMouseOut);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
   }, [scale, distance, isMouseDown]);
 
@@ -137,6 +195,9 @@ function Dot(props: DotProps) {
         alignItems: 'center',
         justifyContent: 'center',
         pointerEvents: 'none',
+        WebkitUserSelect: 'none',
+        WebkitTouchCallout: 'none',
+        userSelect: 'none',
       }}
     >
       <div
@@ -150,6 +211,9 @@ function Dot(props: DotProps) {
           backgroundColor: colorOut,
           scale: `${scale * innerPortion + (1 - innerPortion)}`,
           pointerEvents: 'none',
+          WebkitUserSelect: 'none',
+          WebkitTouchCallout: 'none',
+          userSelect: 'none',
         }}
         {...props}
       />
@@ -164,6 +228,9 @@ function Dot(props: DotProps) {
           backgroundColor: colorIn,
           scale: `${scale * innerPortion}`,
           pointerEvents: 'none',
+          WebkitUserSelect: 'none',
+          WebkitTouchCallout: 'none',
+          userSelect: 'none',
         }}
       />
     </div>

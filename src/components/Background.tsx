@@ -37,6 +37,9 @@ function Background() {
         gridTemplateColumns: `repeat(${gridSize[0]}, ${size}px)`,
         gridTemplateRows: `repeat(${gridSize[1]}, ${size}px)`,
         pointerEvents: 'none',
+        WebkitUserSelect: 'none',
+        WebkitTouchCallout: 'none',
+        userSelect: 'none',
       }}
     >
       {Array(gridSize[0] * gridSize[1])
