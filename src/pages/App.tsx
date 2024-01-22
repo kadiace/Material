@@ -1,40 +1,32 @@
-/* eslint-disable react/no-unknown-property */
-import Background from 'components/Background';
-
-// import Canvas from 'components/Canvas';
 import 'pages/App.css';
+import Mobile from 'pages/Mobile';
+import Web from 'pages/Web';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 function App() {
+  const [ratio, setRatio] = useState(window.innerWidth / window.innerHeight);
+  const handleResize = () => {
+    setRatio(window.innerWidth / window.innerHeight);
+  };
   useEffect(() => {
-    document.addEventListener(
-      'touchmove',
-      (event: TouchEvent) => {
-        event.preventDefault();
-      },
-      { passive: false },
-    );
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
   return (
     <div
       id='root'
       draggable='false'
       style={{
-        width: '100%',
-        height: '100%',
-        position: 'fixed',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
         pointerEvents: 'none',
         WebkitUserSelect: 'none',
         WebkitTouchCallout: 'none',
         userSelect: 'none',
       }}
     >
-      <Background />
-      {/* <Canvas /> */}
+      {ratio < 5 / 7 ? <Mobile /> : <Web />}
     </div>
   );
 }

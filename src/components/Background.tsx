@@ -1,57 +1,79 @@
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 import Dot from './Dot';
 
 function Background() {
   /** CONST */
-  const size = 40;
-  const [gridSize, setGridSize] = useState([
-    Math.ceil(window.innerWidth / size),
-    Math.ceil(window.innerHeight / size),
-  ]);
-  const handleGridResize = () => {
-    setGridSize([
-      Math.ceil(window.innerWidth / size),
-      Math.ceil(window.innerHeight / size),
-    ]);
+  const myRef = useRef<HTMLDivElement>(null);
+  const isMobile = window.innerWidth / window.innerHeight < 5 / 7;
+  const [dotSize, setDotSize] = useState<number>(0);
+  const [gridSize, setGridSize] = useState([15, 21]);
+  const [left, setLeft] = useState<number>(0);
+  const [top, setTop] = useState<number>(0);
+
+  const handleResize = (elem: HTMLElement) => () => {
+    const {
+      width,
+      height,
+      left: newLeft,
+      top: newTop,
+    } = elem.getBoundingClientRect();
+    const newDotSize = isMobile ? width / 15 : height / 21;
+    const newGridSize = isMobile
+      ? [15, Math.min(30, Math.floor(height / newDotSize))]
+      : [Math.min(30, Math.floor(width / newDotSize)), 21];
+    setLeft(newLeft + (width - newDotSize * newGridSize[0]) / 2);
+    setTop(newTop + (height - newDotSize * newGridSize[1]) / 2);
+    setDotSize(newDotSize);
+    setGridSize(newGridSize);
   };
 
   /** HOOK */
-  useEffect(() => {
-    window.addEventListener('resize', handleGridResize);
-
-    return () => {
-      window.removeEventListener('resize', handleGridResize);
-    };
-  });
+  useLayoutEffect(() => {
+    const elem = myRef.current;
+    if (elem) {
+      handleResize(elem)();
+      window.addEventListener('resize', handleResize(elem));
+      return () => {
+        window.removeEventListener('resize', handleResize(elem));
+      };
+    }
+    return () => {};
+  }, []);
 
   return (
     <div
       id='background'
-      draggable='false'
+      ref={myRef}
       style={{
-        position: 'absolute',
-        display: 'grid',
         width: '100%',
         height: '100%',
-        gridTemplateColumns: `repeat(${gridSize[0]}, ${size}px)`,
-        gridTemplateRows: `repeat(${gridSize[1]}, ${size}px)`,
-        pointerEvents: 'none',
-        WebkitUserSelect: 'none',
-        WebkitTouchCallout: 'none',
-        userSelect: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
-      {Array(gridSize[0] * gridSize[1])
-        .fill(0)
-        .map((value, index) => (
-          <Dot
-            key={index}
-            size={size}
-            gridX={index % gridSize[0]}
-            gridY={Math.floor(index / gridSize[0])}
-          />
-        ))}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${gridSize[0]}, ${dotSize}px)`,
+          gridTemplateRows: `repeat(${gridSize[1]}, ${dotSize}px)`,
+          backgroundColor: '#e2e2e2',
+        }}
+      >
+        {Array(gridSize[0] * gridSize[1])
+          .fill(0)
+          .map((value, index) => (
+            <Dot
+              key={index}
+              size={dotSize}
+              position={[
+                left + (index % gridSize[0]) * dotSize + dotSize / 2,
+                top + Math.floor(index / gridSize[0]) * dotSize + dotSize / 2,
+              ]}
+            />
+          ))}
+      </div>
     </div>
   );
 }

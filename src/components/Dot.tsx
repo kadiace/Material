@@ -1,57 +1,22 @@
 import { useEffect, useState } from 'react';
-
-type Position = [x: number, y: number];
-
-const calculateDistance = (pos1: Position, pos2: Position) => {
-  return Math.hypot(pos1[0] - pos2[0], pos1[1] - pos2[1]);
-};
-const getLinearScale = (
-  distance: number,
-  effectDistance: number,
-  minScale: number,
-  maxScale: number,
-) => {
-  return (distance / effectDistance) * (maxScale - minScale) + minScale;
-};
-const getQuadraticScale = (
-  distance: number,
-  effectDistance: number,
-  minScale: number,
-  maxScale: number,
-) => {
-  return (distance / effectDistance) ** 2 * (maxScale - minScale) + minScale;
-};
-// const getRootScale = (
-//   distance: number,
-//   effectDistance: number,
-//   minScale: number,
-//   maxScale: number,
-// ) => {
-//   return (
-//     Math.sqrt(distance / effectDistance) * (maxScale - minScale) + minScale
-//   );
-// };
-
-export type DotProps = {
-  size: number;
-  gridX: number;
-  gridY: number;
-};
+import {
+  DotProps,
+  Position,
+  calculateDistance,
+  getExponentialScale,
+  getLogScale,
+} from 'utils';
 
 function Dot(props: DotProps) {
   /** CONST */
-  const { size, gridX, gridY } = props;
+  const { size, position } = props;
   const colorIn = 'hsla(256, 100%, 40%, 0.8)';
   const colorOut = 'hsla(61, 100%, 40%, 0.8)';
   const innerPortion = 0.8;
-  const dotPosition: Position = [
-    gridX * size + size / 2,
-    gridY * size + size / 2,
-  ];
   const defaultScale = 1;
   const hoverEffectDistance = size * 8;
-  const hoverMinScale = 0.6;
-  const clickEffectDistance = size * 3;
+  const hoverMinScale = 0.7;
+  const clickEffectDistance = size * 2.5;
   const clickMinScale = 0;
   const clickMaxScale =
     hoverMinScale +
@@ -67,19 +32,21 @@ function Dot(props: DotProps) {
 
   /** LAMBDA FUNCTION */
   const getHoverScale = () => {
-    return getLinearScale(
+    return getLogScale(
       distance,
       hoverEffectDistance,
       hoverMinScale,
       defaultScale,
+      Math.E,
     );
   };
   const getClickScale = () => {
-    return getQuadraticScale(
+    return getExponentialScale(
       distance,
       clickEffectDistance,
       clickMinScale,
       clickMaxScale,
+      Math.E,
     );
   };
   const getTargetScale = () => {
@@ -101,7 +68,7 @@ function Dot(props: DotProps) {
         event.touches[i].clientX,
         event.touches[i].clientY,
       ];
-      distances.push(calculateDistance(dotPosition, touchPosition));
+      distances.push(calculateDistance(position, touchPosition));
     }
     setDistance(Math.min(...distances));
   };
@@ -119,7 +86,7 @@ function Dot(props: DotProps) {
   /** MOUSE EVENT HANDLER */
   const handleMouseMove = (event: MouseEvent) => {
     const mousePosition: Position = [event.clientX, event.clientY];
-    const currentDistance = calculateDistance(dotPosition, mousePosition);
+    const currentDistance = calculateDistance(position, mousePosition);
     setDistance(currentDistance);
 
     const target = getTargetScale();
