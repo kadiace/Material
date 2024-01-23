@@ -58,7 +58,6 @@ function Background() {
           display: 'grid',
           gridTemplateColumns: `repeat(${gridSize[0]}, ${dotSize}px)`,
           gridTemplateRows: `repeat(${gridSize[1]}, ${dotSize}px)`,
-          backgroundColor: '#e2e2e2',
         }}
       >
         {Array(gridSize[0] * gridSize[1])

@@ -82,7 +82,7 @@ function Mobile() {
               writingMode: 'sideways-lr',
             }}
           >
-            物質
+            質物
           </span>
         </div>
       </div>
