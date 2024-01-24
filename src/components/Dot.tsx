@@ -16,15 +16,15 @@ function Dot(props: DotProps) {
   const colorOut2 = 'hsla(339, 73%, 45%, 1)';
   const innerPortion = 0.7;
   const defaultScale = 1;
-  const hoverEffectDistance = size * 7;
-  const hoverMinScale = 0.7;
+  const hoverEffectDistance = size * 4;
+  const hoverMinScale = 0.8;
   const clickEffectDistance = size * 2;
   const clickMinScale = 0;
   const clickMaxScale =
     hoverMinScale +
     ((1 - hoverMinScale) * clickEffectDistance) / hoverEffectDistance;
   const epsilon = 1e-3;
-  const interval = 10;
+  const interval = 50;
   const recoverRatio = 1 / 20;
   const shrinkRatio = 1 / 4;
 
