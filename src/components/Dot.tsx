@@ -25,7 +25,7 @@ function Dot(props: DotProps) {
     ((1 - hoverMinScale) * clickEffectDistance) / hoverEffectDistance;
   const epsilon = 1e-3;
   const interval = 50;
-  const recoverRatio = 1 / 20;
+  const recoverRatio = 1 / 10;
   const shrinkRatio = 1 / 4;
 
   /** STATE */
