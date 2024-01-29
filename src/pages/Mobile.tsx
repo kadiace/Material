@@ -17,7 +17,7 @@ function Mobile() {
       id='mobile'
       style={{
         width: '100%',
-        height: '100%',
+        height: '100dvh',
         position: 'fixed',
         display: 'flex',
         flexDirection: 'column',
