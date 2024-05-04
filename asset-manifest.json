@@ -1,12 +1,12 @@
 {
   "files": {
-    "main.css": "/static/css/main.5f1a6be8.css",
-    "main.js": "/static/js/main.e6e356c7.js",
-    "static/media/ZenAntique-Regular.ttf": "/static/media/ZenAntique-Regular.7dd6a91c3e9e65dc0ac9.ttf",
-    "index.html": "/index.html"
+    "main.css": "/material/static/css/main.03874080.css",
+    "main.js": "/material/static/js/main.46a7eea6.js",
+    "static/media/ZenAntique-Regular.woff2": "/material/static/media/ZenAntique-Regular.7934cb25da27eccbfec9.woff2",
+    "index.html": "/material/index.html"
   },
   "entrypoints": [
-    "static/css/main.5f1a6be8.css",
-    "static/js/main.e6e356c7.js"
+    "static/css/main.03874080.css",
+    "static/js/main.46a7eea6.js"
   ]
 }
